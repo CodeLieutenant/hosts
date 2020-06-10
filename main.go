@@ -156,7 +156,6 @@ type addOptions struct {
 
 func handleError(err error) {
 	if err != nil {
-		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 }
@@ -166,7 +165,7 @@ func main() {
 	removeOpt := &removeOptions{}
 	listOpt := &listOptions{}
 
-	parser := flag.NewNamedParser("Hosts Modifier", flag.Default)
+	parser := flag.NewNamedParser("hosts", flag.Default)
 
 	_, err := parser.AddCommand("add", "Adds new entry", "Adds new entry to `hosts` file", addOpt)
 	handleError(err)
@@ -174,6 +173,7 @@ func main() {
 	handleError(err)
 	_, err = parser.AddCommand("list", "List all", "Lists all lines from hosts file", listOpt)
 	handleError(err)
+
 	_, err = parser.Parse()
 	handleError(err)
 
