@@ -2,10 +2,9 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
+	flag "github.com/jessevdk/go-flags"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 )
@@ -141,47 +140,51 @@ func removeHost(src, host string) error {
 	return nil
 }
 
-func main() {
+type listOptions struct {
+	File string `default:"C:\\Windows\\System32\\drivers\\etc\\hosts" short:"f" long:"file" required:"false"`
+}
 
-	args := os.Args[1:]
+type removeOptions struct {
+	listOptions
+	Host string `required:"true" short:"p" long:"host"`
+}
 
-	if len(args) < 1 {
-		log.Fatal("Action is not supplied")
+type addOptions struct {
+	removeOptions
+	Ip string `required:"true" short:"i" long:"ip"`
+}
+
+func handleError(err error) {
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
 	}
+}
 
-	action := args[0]
+func main() {
+	addOpt := &addOptions{}
+	removeOpt := &removeOptions{}
+	listOpt := &listOptions{}
 
-	file := flag.String("file", "C:\\Windows\\System32\\drivers\\etc\\hosts", "Host file")
-	ip := flag.String("ip", "127.0.0.1", "ip address")
-	host := flag.String("host", "", "Host")
+	parser := flag.NewNamedParser("Hosts Modifier", flag.Default)
 
-	flag.Parse()
+	_, err := parser.AddCommand("add", "Adds new entry", "Adds new entry to `hosts` file", addOpt)
+	handleError(err)
+	_, err = parser.AddCommand("remove", "Remove single entry", "Removes single host entry in `hosts` file by dns name", removeOpt)
+	handleError(err)
+	_, err = parser.AddCommand("list", "List all", "Lists all lines from hosts file", listOpt)
+	handleError(err)
+	_, err = parser.Parse()
+	handleError(err)
 
-	switch strings.ToLower(action) {
+	switch parser.Active.Name {
 	case "add":
-		if *host == "" || *ip == "" {
-			log.Fatal("Provide host and ip flags")
-		}
-
-		if err := appendHost(*file, *host, *ip); err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("New host added to file: %s %s\n", *host, *ip)
-
+		handleError(appendHost(addOpt.File, addOpt.Host, addOpt.Ip))
+		fmt.Printf("New host added to file: %s %s\n", addOpt.Host, addOpt.Ip)
 	case "remove":
-		if *host == "" {
-			log.Fatal("Host is not supplied")
-		}
-		if err := removeHost(*file, *host); err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("Host removed from file: %s %s\n", *host, *ip)
-
+		handleError(removeHost(removeOpt.File, removeOpt.Host))
+		fmt.Printf("Host removed from file: %s\n", removeOpt.Host)
 	case "list":
-		if err := listHosts(*file); err != nil {
-			log.Fatal(err)
-		}
-	default:
-		log.Fatal("Action needs to ADD|REMOVE|LIST")
+		handleError(listHosts(listOpt.File))
 	}
 }
