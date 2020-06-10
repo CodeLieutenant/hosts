@@ -11,7 +11,7 @@ type Options struct {
 
 func NewOptions() (*Options, error) {
 	options := &Options{}
-	parser := flags.NewNamedParser("host", flags.Default)
+	parser := flags.NewNamedParser("host", 	flags.HelpFlag | flags.PassDoubleDash)
 
 	_, err := parser.AddCommand("add", "Adds new entry", "Adds new entry to `host` file", options)
 
