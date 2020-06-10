@@ -77,7 +77,6 @@ func listHosts(src string) error {
 	return nil
 }
 
-
 func appendHost(src, host, ip string) error {
 	f, err := os.OpenFile(src, os.O_APPEND, 0777)
 
