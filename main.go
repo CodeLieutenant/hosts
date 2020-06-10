@@ -59,11 +59,11 @@ func listHosts(src string) error {
 	}
 
 	handleFunc := func(h, ip string, isComment bool) error {
-		fmt.Printf("Host: %s, IP: %s", h, ip)
+		fmt.Printf("Host: %s, IP: %s\n", h, ip)
 		return nil
 	}
 
-	err = iterate(bufio.NewScanner(f), handleFunc, true)
+	err = iterate(bufio.NewScanner(f), handleFunc, false)
 
 	if err != nil {
 		return err
