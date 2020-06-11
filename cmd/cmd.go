@@ -1,9 +1,12 @@
 package cmd
 
-import "github.com/jessevdk/go-flags"
+import (
+	"github.com/jessevdk/go-flags"
+	"runtime"
+)
 
 type ListOptions struct {
-	File string `default:"C:\\Windows\\System32\\drivers\\etc\\hosts" short:"f" long:"file" required:"false"`
+	File string `default:"" short:"f" long:"file" required:"false"`
 }
 
 type RemoveOptions struct {
@@ -20,6 +23,34 @@ type Options struct {
 	RemoveOptions *RemoveOptions
 	ListOptions   *ListOptions
 	command       string
+}
+
+type setDefaultFile interface {
+	setFile(hosts string)
+	getFile() string
+}
+
+func (l *ListOptions) setFile(hosts string) {
+	l.File = hosts
+}
+
+func (l *ListOptions) getFile() string {
+	return l.File
+}
+
+func assignDefaultHostsFile(options ...setDefaultFile) {
+	defaultPath := ""
+	if runtime.GOOS == "windows" {
+		defaultPath = "C:\\Windows\\System32\\drivers\\hosts"
+	} else {
+		defaultPath = "/etc/hosts"
+	}
+
+	for _, o := range options {
+		if o.getFile() == "" {
+			o.setFile(defaultPath)
+		}
+	}
 }
 
 func NewOptions() (*Options, error) {
@@ -58,6 +89,7 @@ func NewOptions() (*Options, error) {
 	}
 	options.command = parser.Active.Name
 
+	assignDefaultHostsFile(addOptions, removeOptions, listOptions)
 	return options, nil
 }
 
