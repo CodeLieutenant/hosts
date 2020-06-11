@@ -22,22 +22,22 @@ func main() {
 
 	switch options.Command() {
 	case "add":
-		file, err := os.OpenFile(options.File, os.O_APPEND, 0777)
+		file, err := os.OpenFile(options.AddOptions.File, os.O_APPEND, 0777)
 		handleError(err)
 		defer file.Close()
 		p := host.NewParser(file)
-		handleError(p.Add(options.Host, options.Ip))
-		fmt.Printf("New host added to file: %s %s\n", options.Host, options.Ip)
+		handleError(p.Add(options.AddOptions.Host, options.AddOptions.Ip))
+		fmt.Printf("New host added to file: %s %s\n", options.AddOptions.Host, options.AddOptions.Ip)
 	case "remove":
 		tmp, err := ioutil.TempFile("", "hosts_copy")
 		handleError(err)
-		file, err := os.OpenFile(options.File, os.O_RDONLY, 0777)
+		file, err := os.OpenFile(options.RemoveOptions.File, os.O_RDONLY, 0777)
 		handleError(err)
 		p := host.NewParser(file)
-		handleError(p.Remove(tmp, options.Host))
-		fmt.Printf("Host removed from file: %s\n", options.Host)
+		handleError(p.Remove(tmp, options.RemoveOptions.Host))
+		fmt.Printf("Host removed from file: %s\n", options.RemoveOptions.Host)
 	case "list":
-		file, err := os.OpenFile(options.File, os.O_RDONLY, 0777)
+		file, err := os.OpenFile(options.ListOptions.File, os.O_RDONLY, 0777)
 		handleError(err)
 		defer file.Close()
 		p := host.NewParser(file)
