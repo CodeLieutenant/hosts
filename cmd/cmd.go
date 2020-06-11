@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/jessevdk/go-flags"
 	"runtime"
 )
@@ -38,12 +39,14 @@ func (l *ListOptions) getFile() string {
 	return l.File
 }
 
-func assignDefaultHostsFile(options ...setDefaultFile) {
+func assignDefaultHostsFile(options ...setDefaultFile) error {
 	defaultPath := ""
 	if runtime.GOOS == "windows" {
-		defaultPath = "C:\\Windows\\System32\\drivers\\hosts"
-	} else {
+		defaultPath = "C:\\Windows\\System32\\drivers\\etc\\hosts"
+	} else if runtime.GOOS == "linux" {
 		defaultPath = "/etc/hosts"
+	} else {
+		return fmt.Errorf("%s system is not supported", runtime.GOOS)
 	}
 
 	for _, o := range options {
@@ -51,6 +54,7 @@ func assignDefaultHostsFile(options ...setDefaultFile) {
 			o.setFile(defaultPath)
 		}
 	}
+	return nil
 }
 
 func NewOptions() (*Options, error) {
@@ -87,9 +91,12 @@ func NewOptions() (*Options, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	options.command = parser.Active.Name
 
-	assignDefaultHostsFile(addOptions, removeOptions, listOptions)
+	if err := assignDefaultHostsFile(addOptions, removeOptions, listOptions); err != nil {
+		return nil, err
+	}
 	return options, nil
 }
 
