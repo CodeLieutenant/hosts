@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 )
 
@@ -12,7 +11,9 @@ type HandleHost func(host, ip string, isComment bool) error
 
 type ReadWriteNameCloser interface {
 	io.ReadWriteCloser
+	io.Seeker
 	Name() string
+	Truncate(int64) error
 }
 type WriteNameCloser interface {
 	io.WriteCloser
@@ -20,7 +21,8 @@ type WriteNameCloser interface {
 }
 
 type Parser interface {
-	Remove(tmp WriteNameCloser, host string) error
+	io.Closer
+	Remove(tmp ReadWriteNameCloser, host string) error
 	List(handle HandleHost) error
 	Add(host, ip string) error
 }
@@ -36,7 +38,7 @@ func NewParser(r ReadWriteNameCloser) Parser {
 func iterate(scanner *bufio.Scanner, handle HandleHost, includeComments bool) error {
 	builders := [2]strings.Builder{}
 	for scanner.Scan() {
-		line := strings.Trim(scanner.Text(), "\n \t")
+		line := strings.TrimSpace(scanner.Text())
 		index := 0
 
 		if strings.HasPrefix(line, "#") || len(line) == 0 {
@@ -73,7 +75,7 @@ func iterate(scanner *bufio.Scanner, handle HandleHost, includeComments bool) er
 
 }
 
-func (p *parser) Remove(tmp WriteNameCloser, host string) error {
+func (p *parser) Remove(tmp ReadWriteNameCloser, host string) error {
 
 	handleFunc := func(h, ip string, isComment bool) error {
 		if isComment {
@@ -100,15 +102,15 @@ func (p *parser) Remove(tmp WriteNameCloser, host string) error {
 		return err
 	}
 
-	if err := p.file.Close(); err != nil {
+	if err := p.file.Truncate(0); err != nil {
 		return err
 	}
 
-	if err := tmp.Close(); err != nil {
+	if _, err := p.file.Seek(0, 0); err != nil {
 		return err
 	}
 
-	if err := os.Rename(tmp.Name(), p.file.Name()); err != nil {
+	if _, err := io.Copy(p.file, tmp); err != nil {
 		return err
 	}
 
@@ -133,4 +135,8 @@ func (p *parser) Add(host, ip string) error {
 	}
 
 	return nil
+}
+
+func (p *parser) Close() error {
+	return p.file.Close()
 }
