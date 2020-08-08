@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 )
 
@@ -82,8 +83,8 @@ func iterate(scanner *bufio.Scanner, handle HandleHost, includeComments bool) er
 
 func (p *parser) Remove(tmp ReadWriteNameCloser, host string) error {
 
-	handleFunc := func(h, ip string, isComment bool) error {
-		if isComment {
+	handleFunc := func(h, ip string, hasComment bool) error {
+		if hasComment {
 			_, err := tmp.Write([]byte(fmt.Sprintf("%s\n", h)))
 			if err != nil {
 				return err
@@ -111,9 +112,11 @@ func (p *parser) Remove(tmp ReadWriteNameCloser, host string) error {
 		return err
 	}
 
-	if _, err := p.file.Seek(0, 0); err != nil {
+	if _, err := p.file.Seek(0, os.SEEK_SET); err != nil {
 		return err
 	}
+
+	tmp.Seek(0, os.SEEK_SET)
 
 	if _, err := io.Copy(p.file, tmp); err != nil {
 		return err

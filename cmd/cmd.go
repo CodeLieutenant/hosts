@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/jessevdk/go-flags"
 	"runtime"
+
+	"github.com/jessevdk/go-flags"
 )
 
 type ListOptions struct {
