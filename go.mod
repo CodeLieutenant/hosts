@@ -1,4 +1,4 @@
-module github.com/malusev998/hosts
+module github.com/BrosSquad/hosts
 
 go 1.14
 

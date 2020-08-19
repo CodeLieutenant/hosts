@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/BrosSquad/hosts/cmd"
+	"github.com/BrosSquad/hosts/host"
 	_ "github.com/jessevdk/go-flags"
-	"github.com/malusev998/hosts/cmd"
-	"github.com/malusev998/hosts/host"
 )
 
 func handleError(err error) {

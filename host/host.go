@@ -33,7 +33,7 @@ type parser struct {
 }
 
 func NewParser(r ReadWriteNameCloser) Parser {
-	return &parser{file: r}
+	return parser{file: r}
 }
 
 func iterate(scanner *bufio.Scanner, handle HandleHost, includeComments bool) error {
@@ -81,7 +81,7 @@ func iterate(scanner *bufio.Scanner, handle HandleHost, includeComments bool) er
 
 }
 
-func (p *parser) Remove(tmp ReadWriteNameCloser, host string) error {
+func (p parser) Remove(tmp ReadWriteNameCloser, host string) error {
 
 	handleFunc := func(h, ip string, hasComment bool) error {
 		if hasComment {
@@ -125,7 +125,7 @@ func (p *parser) Remove(tmp ReadWriteNameCloser, host string) error {
 	return nil
 }
 
-func (p *parser) List(handle HandleHost) error {
+func (p parser) List(handle HandleHost) error {
 	err := iterate(bufio.NewScanner(p.file), handle, false)
 
 	if err != nil {
@@ -135,7 +135,7 @@ func (p *parser) List(handle HandleHost) error {
 	return nil
 }
 
-func (p *parser) Add(host, ip string) error {
+func (p parser) Add(host, ip string) error {
 	_, err := p.file.Write([]byte(fmt.Sprintf("%s	%s\n", ip, host)))
 
 	if err != nil {
@@ -145,6 +145,6 @@ func (p *parser) Add(host, ip string) error {
 	return nil
 }
 
-func (p *parser) Close() error {
+func (p parser) Close() error {
 	return p.file.Close()
 }
