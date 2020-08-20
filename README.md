@@ -3,7 +3,7 @@
 
 # Introduction
 
-Hosts-modifier is program that aims to help you manager system hosts file (/etc/hosts on linux and C:\Windows\system32\drivers\etc\hosts on Windows).
+Hosts-modifier is program that aims to help you manager system hosts file (```/etc/hosts``` on linux and ```C:\Windows\system32\drivers\etc\hosts``` on Windows).
 It simplifies process of adding, removing and listing lines in the file. 
 (Adding and Removing required administrator privileges to console)
 
