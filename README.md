@@ -4,14 +4,19 @@
 # Introduction
 
 Hosts-modifier is a program that aims to help you manage the system hosts file (```/etc/hosts``` on linux and ```C:\Windows\system32\drivers\etc\hosts``` on Windows).
-It simplifies the process of adding, removing and listing lines in the file. 
+It simplifies the process of adding, removing and listing lines in the file.
 (Adding and Removing require administrator or super user privileges in the console or terminal.)
 
 This program is designed for developers to help them manage host files, which they often do. (PHP develpment with XAMPP or any LAMPP stack, Laravel, Blocking sites etc...).
 
 # Installation
 
-Currently  the only supported method of installation is building the program from source code. (Don't worry, go build is simple)
+Arch Linux users can build the program from the AUR, here is an example using yay:
+```sh
+yay -S hosts-modifier
+```
+
+Currently the only supported methods of installation are building the program from source code or building the program from the AUR. (Don't worry, go build is simple and so is the AUR.)
 **Make sure you have golang installed for your operating system**
 
 ```sh
@@ -57,7 +62,7 @@ $ hosts list
 
 ## Disclaimer
 
-This program works only on Linux and on Windows, MacOS is not supported and it will never be, despite the fact that code for linux will (probably) work on MacOS. We won't accept any pull requests concerning MacOS and all Issues related to MacOS will promptly be closed. 
+This program works only on Linux and on Windows, MacOS is not supported and it will never be, despite the fact that code for linux will (probably) work on MacOS. We won't accept any pull requests concerning MacOS and all Issues related to MacOS will promptly be closed.
 Other contributions like list filtering and other ideas are all welcome and will most likely be accepted and merged into main branch.
 
 ## Licence
