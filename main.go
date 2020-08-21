@@ -2,12 +2,15 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+
 	"github.com/BrosSquad/hosts/cmd"
 	"github.com/BrosSquad/hosts/host"
 	_ "github.com/jessevdk/go-flags"
-	"io/ioutil"
-	"os"
 )
+
+const Localhost = "127.0.0.1"
 
 func handleError(err error) {
 	if err != nil {
@@ -17,13 +20,12 @@ func handleError(err error) {
 }
 
 func main() {
-	const Localhost = "127.0.0.1"
 	options, err := cmd.NewOptions()
 	handleError(err)
 
 	switch options.Command() {
 	case "add":
-		if len(options.AddOptions.Ip) == 0 {
+		if options.AddOptions.Ip == "" {
 			options.AddOptions.Ip = Localhost
 		}
 
