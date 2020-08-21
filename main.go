@@ -10,6 +10,8 @@ import (
 	_ "github.com/jessevdk/go-flags"
 )
 
+const Localhost = "127.0.0.1"
+
 func handleError(err error) {
 	if err != nil {
 		fmt.Println(err)
@@ -23,6 +25,10 @@ func main() {
 
 	switch options.Command() {
 	case "add":
+		if options.AddOptions.Ip == "" {
+			options.AddOptions.Ip = Localhost
+		}
+
 		file, err := os.OpenFile(options.AddOptions.File, os.O_RDWR|os.O_APPEND, 0644)
 		handleError(err)
 		p := host.NewParser(file)

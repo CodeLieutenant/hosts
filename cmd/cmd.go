@@ -17,7 +17,7 @@ type RemoveOptions struct {
 }
 type AddOptions struct {
 	RemoveOptions
-	Ip string `required:"true" short:"i" long:"ip"`
+	Ip string `required:"false" short:"i" long:"ip"`
 }
 
 type Options struct {
