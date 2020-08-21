@@ -3,16 +3,15 @@
 
 # Introduction
 
-Hosts-modifier is program that aims to help you manager system hosts file (```/etc/hosts``` on linux and ```C:\Windows\system32\drivers\etc\hosts``` on Windows).
-It simplifies process of adding, removing and listing lines in the file. 
-(Adding and Removing required administrator privileges to console)
+Hosts-modifier is a program that aims to help you manage the system hosts file (```/etc/hosts``` on linux and ```C:\Windows\system32\drivers\etc\hosts``` on Windows).
+It simplifies the process of adding, removing and listing lines in the file. 
+(Adding and Removing require administrator or super user privileges in the console or terminal.)
 
-This program is designed for developers to help them manage host files, which they often do. (Php develpment with XAMPP or any LAMPP stack, Laravel, Blocking sites etc...).
+This program is designed for developers to help them manage host files, which they often do. (PHP develpment with XAMPP or any LAMPP stack, Laravel, Blocking sites etc...).
 
+# Installation
 
-# Installing
-
-Currently only supported method of installing is building it from source. (Don't worry, go building is simple)
+Currently  the only supported method of installation is building the program from source code. (Don't worry, go build is simple)
 **Make sure you have golang installed for your operating system**
 
 ```sh
@@ -23,7 +22,7 @@ That's all.
 
 # Usage
 
-> hosts-modifier is command line program
+> hosts-modifier is a command line program
 
 
 #### Get Help
@@ -58,7 +57,7 @@ $ hosts list
 
 ## Disclaimer
 
-This program works only on Linux and on Windows, MacOS is not supported and it will never be, despite the fact that code for linux will (probably) work on MacOS. We won't accept any pull requests concerning MacOS and all Issues related with MacOS will be promptly closed. 
+This program works only on Linux and on Windows, MacOS is not supported and it will never be, despite the fact that code for linux will (probably) work on MacOS. We won't accept any pull requests concerning MacOS and all Issues related to MacOS will promptly be closed. 
 Other contributions like list filtering and other ideas are all welcome and will most likely be accepted and merged into main branch.
 
 ## Licence
