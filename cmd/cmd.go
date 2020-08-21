@@ -47,7 +47,7 @@ func assignDefaultHostsFile(options ...setDefaultFile) error {
 	} else if runtime.GOOS == "linux" {
 		defaultPath = "/etc/hosts"
 	} else {
-		return fmt.Errorf("%s system is not supported", runtime.GOOS)
+		return fmt.Errorf("%s Operating system not supported.", runtime.GOOS)
 	}
 
 	for _, o := range options {
@@ -69,19 +69,19 @@ func NewOptions() (*Options, error) {
 	}
 	parser := flags.NewNamedParser("host", flags.HelpFlag|flags.PassDoubleDash)
 
-	_, err := parser.AddCommand("add", "Adds new entry", "Adds new entry to `host` file", addOptions)
+	_, err := parser.AddCommand("add", "Adds a new entry", "Adds a new entry to the hosts file.", addOptions)
 
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = parser.AddCommand("remove", "Remove single entry", "Removes single host entry in `host` file by dns name", removeOptions)
+	_, err = parser.AddCommand("remove", "Remove a single entry", "Removes a single host entry in the hosts file by DNS.", removeOptions)
 
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = parser.AddCommand("list", "List all", "Lists all lines from host file", listOptions)
+	_, err = parser.AddCommand("list", "List all entries", "Lists all entries present in the hosts file.", listOptions)
 
 	if err != nil {
 		return nil, err
