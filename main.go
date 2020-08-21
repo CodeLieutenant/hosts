@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
-
 	"github.com/BrosSquad/hosts/cmd"
 	"github.com/BrosSquad/hosts/host"
 	_ "github.com/jessevdk/go-flags"
+	"io/ioutil"
+	"os"
 )
 
 func handleError(err error) {
@@ -18,11 +17,16 @@ func handleError(err error) {
 }
 
 func main() {
+	const Localhost = "127.0.0.1"
 	options, err := cmd.NewOptions()
 	handleError(err)
 
 	switch options.Command() {
 	case "add":
+		if len(options.AddOptions.Ip) == 0 {
+			options.AddOptions.Ip = Localhost
+		}
+
 		file, err := os.OpenFile(options.AddOptions.File, os.O_RDWR|os.O_APPEND, 0644)
 		handleError(err)
 		p := host.NewParser(file)
