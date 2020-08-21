@@ -16,7 +16,7 @@ Currently only supported method of installing is building it from source. (Don't
 **Make sure you have golang installed for your operating system**
 
 ```sh
-go get github.com/BrosSquad/hosts-modifier
+go get github.com/BrosSquad/hosts
 ```
 **Make sure you've added $GOPATH/bin to the $PATH**
 That's all.
@@ -38,6 +38,11 @@ $ hosts --help
 $ hosts add --host example.com --ip 127.0.0.1
 ```
 
+- If you don't pass ip, defaults to "127.0.0.1" (same as example above)
+
+```sh
+$ hosts add --host example.com
+```
 
 #### Remove Host
 
