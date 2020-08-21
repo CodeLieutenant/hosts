@@ -58,11 +58,9 @@ $ hosts list
 
 ## Disclaimer
 
-This program works only on Linux and on Windows, MacOS is not supported and it will never be, even though code for linux will (maybe) work on MacOS.
-Sorry apple duds, install linux its better. We wont accept any pull requests related to MacOS and all Issues related with MacOS will be closed. 
+This program works only on Linux and on Windows, MacOS is not supported and it will never be, despite the fact that code for linux will (probably) work on MacOS. We won't accept any pull requests concerning MacOS and all Issues related with MacOS will be promptly closed. 
 Other contributions like list filtering and other ideas are all welcome and will most likely be accepted and merged into main branch.
 
 ## Licence
 
-only **GNU GPL v2**
-
+This program is licensed under the terms of the **GNU GPL v2** only.
