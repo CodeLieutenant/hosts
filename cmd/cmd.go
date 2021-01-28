@@ -1,106 +1,45 @@
 package cmd
 
 import (
-	"fmt"
+	"context"
 	"runtime"
 
-	"github.com/jessevdk/go-flags"
+	"github.com/spf13/cobra"
 )
 
-type ListOptions struct {
-	File string `default:"" short:"f" long:"file" required:"false"`
-}
+const (
+	WindowsHostsPath   = "C:\\Windows\\System32\\drivers\\etc\\hosts"
+	LinuxHostsFilePath = "/etc/hosts"
 
-type RemoveOptions struct {
-	ListOptions
-	Host string `required:"true" short:"p" long:"host"`
-}
-type AddOptions struct {
-	RemoveOptions
-	Ip string `required:"false" short:"i" long:"ip"`
-}
+	Localhost = "127.0.0.1"
+)
 
-type Options struct {
-	AddOptions    *AddOptions
-	RemoveOptions *RemoveOptions
-	ListOptions   *ListOptions
-	command       string
-}
+var (
+	rootCmd = &cobra.Command{
+		Use:   "hosts",
+		Short: "Host parser",
+		Long:  "Hosts file parsers and modifier",
+	}
 
-type setDefaultFile interface {
-	setFile(hosts string)
-	getFile() string
-}
+	filePath string
+)
 
-func (l *ListOptions) setFile(hosts string) {
-	l.File = hosts
-}
+func Execute(ctx context.Context, version string) error {
+	defaultHostsPath := ""
 
-func (l *ListOptions) getFile() string {
-	return l.File
-}
-
-func assignDefaultHostsFile(options ...setDefaultFile) error {
-	defaultPath := ""
 	if runtime.GOOS == "windows" {
-		defaultPath = "C:\\Windows\\System32\\drivers\\etc\\hosts"
+		defaultHostsPath = WindowsHostsPath
 	} else if runtime.GOOS == "linux" {
-		defaultPath = "/etc/hosts"
-	} else {
-		return fmt.Errorf("%s Operating system not supported.", runtime.GOOS)
+		defaultHostsPath = LinuxHostsFilePath
 	}
 
-	for _, o := range options {
-		if o.getFile() == "" {
-			o.setFile(defaultPath)
-		}
-	}
-	return nil
-}
+	rootCmd.Version = version
 
-func NewOptions() (*Options, error) {
-	addOptions := &AddOptions{}
-	listOptions := &ListOptions{}
-	removeOptions := &RemoveOptions{}
-	options := &Options{
-		AddOptions:    addOptions,
-		RemoveOptions: removeOptions,
-		ListOptions:   listOptions,
-	}
-	parser := flags.NewNamedParser("host", flags.HelpFlag|flags.PassDoubleDash)
+	rootCmd.PersistentFlags().StringVarP(&filePath, "file", "f", defaultHostsPath, "Path to 'Hosts' file")
 
-	_, err := parser.AddCommand("add", "Adds a new entry", "Adds a new entry to the hosts file.", addOptions)
+	rootCmd.AddCommand(appendCommand())
+	rootCmd.AddCommand(removeCommand())
+	rootCmd.AddCommand(listCommand())
 
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = parser.AddCommand("remove", "Remove a single entry", "Removes a single host entry in the hosts file by DNS.", removeOptions)
-
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = parser.AddCommand("list", "List all entries", "Lists all entries present in the hosts file.", listOptions)
-
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = parser.Parse()
-
-	if err != nil {
-		return nil, err
-	}
-
-	options.command = parser.Active.Name
-
-	if err := assignDefaultHostsFile(addOptions, removeOptions, listOptions); err != nil {
-		return nil, err
-	}
-	return options, nil
-}
-
-func (o *Options) Command() string {
-	return o.command
+	return rootCmd.ExecuteContext(ctx)
 }

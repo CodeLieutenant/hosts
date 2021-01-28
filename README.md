@@ -20,7 +20,7 @@ Currently the only supported methods of installation are building the program fr
 **Make sure you have golang installed for your operating system**
 
 ```sh
-go get github.com/BrosSquad/hosts
+go get github.com/BrosSquad/hosts/cmd/hosts
 ```
 **Make sure you've added $GOPATH/bin to the $PATH**
 That's all.
@@ -39,19 +39,19 @@ $ hosts --help
 #### Add Host
 
 ```sh
-$ hosts add --host example.com --ip 127.0.0.1
+$ hosts add example.com 127.0.0.1
 ```
 
 - If you don't pass ip, defaults to "127.0.0.1" (same as example above)
 
 ```sh
-$ hosts add --host example.com
+$ hosts add example.com
 ```
 
 #### Remove Host
 
 ```sh
-$ hosts remove --host example.com --ip 127.0.0.1
+$ hosts remove example.com
 ```
 
 #### List Hosts
@@ -59,11 +59,6 @@ $ hosts remove --host example.com --ip 127.0.0.1
 ```sh
 $ hosts list
 ```
-
-## Disclaimer
-
-This program works only on Linux and on Windows, MacOS is not supported and it will never be, despite the fact that code for linux will (probably) work on MacOS. We won't accept any pull requests concerning MacOS and all Issues related to MacOS will promptly be closed.
-Other contributions like list filtering and other ideas are all welcome and will most likely be accepted and merged into main branch.
 
 ## Licence
 
