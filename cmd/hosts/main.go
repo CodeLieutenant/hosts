@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/BrosSquad/hosts/cmd"
-	_ "github.com/jessevdk/go-flags"
 )
 
 var Version = "dev"
