@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/BrosSquad/hosts"
+	"github.com/BrosSquad/hosts/v2"
 )
 
 func setup(t *testing.T) (hosts.Parser, *os.File) {

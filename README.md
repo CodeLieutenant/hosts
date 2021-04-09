@@ -20,7 +20,7 @@ Currently the only supported methods of installation are building the program fr
 **Make sure you have golang installed for your operating system**
 
 ```sh
-go get github.com/BrosSquad/hosts/cmd/hosts
+go get github.com/BrosSquad/hosts/v2/cmd/hosts
 ```
 **Make sure you've added $GOPATH/bin to the $PATH**
 That's all.

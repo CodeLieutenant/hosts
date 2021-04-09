@@ -41,3 +41,14 @@ endif
 .PHONY: clean
 clean:
 	rm -rf ./bin
+
+.PHONY: docker-image-build
+docker-image-build: clean
+	VERSION=$(VERSION) RACE=$(RACE) ENVIRONMENT=$(ENVIRONMENT) docker build --build-arg VERSION --build-arg ENVIRONMENT --build-arg RACE --compress --tag brossquad/fiber-dev:1.0.4 --rm .
+
+docker-test:
+ifeq ($(RACE), 1)
+	docker run --rm -it -w /app -v $(shell pwd):/app brossquad/fiber-dev:1.0.4 go test ./... -race -covermode=atomic -coverprofile=coverage.txt -timeout 5m
+else
+	docker run --rm -it -w /app -v $(shell pwd):/app brossquad/fiber-dev:1.0.4 go test ./... -covermode=atomic -coverprofile=coverage.txt -timeout 1m
+endif

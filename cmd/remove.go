@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/BrosSquad/hosts"
+	"github.com/BrosSquad/hosts/v2"
 	"github.com/spf13/cobra"
 )
 

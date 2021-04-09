@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/BrosSquad/hosts/cmd"
+	"github.com/BrosSquad/hosts/v2/cmd"
 )
 
 var Version = "dev"
