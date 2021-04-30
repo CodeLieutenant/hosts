@@ -40,9 +40,9 @@ func TestAdd(t *testing.T) {
 	})
 
 	t.Run("Appends new host to the end of the file", func(t *testing.T) {
-		file, removeFile := createFile(t)
+		file, removeFile := createFile(t, "./hosts-add.txt")
 		defer removeFile()
-		command := appendCommand("./hosts.txt")
+		command := appendCommand("./hosts-add.txt")
 		command.SetArgs([]string{"somehost.test", "192.168.0.1"})
 		err := command.Execute()
 

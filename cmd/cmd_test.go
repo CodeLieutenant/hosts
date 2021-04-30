@@ -8,14 +8,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createFile(t *testing.T) (*os.File, func()) {
+func createFile(t *testing.T, name string) (*os.File, func()) {
 	assert := require.New(t)
-	file, err := os.Create("./hosts.txt")
+	file, err := os.Create(name)
 	assert.Nil(err)
 
 	return file, func() {
 		assert.Nil(file.Close())
-		os.Remove("./hosts.txt")
+		os.Remove(name)
 	}
 }
 
