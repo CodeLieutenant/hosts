@@ -3,7 +3,7 @@
 
 # Introduction
 
-Hosts-modifier is a program that aims to help you manage the system hosts file (```/etc/hosts``` on linux and ```C:\Windows\system32\drivers\etc\hosts``` on Windows).
+Hosts-modifier is a program that aims to help you manage the system hosts file (```/etc/hosts``` on Linux/MacOS and ```C:\Windows\system32\drivers\etc\hosts``` on Windows).
 It simplifies the process of adding, removing and listing lines in the file.
 (Adding and Removing require administrator or super user privileges in the console or terminal.)
 
@@ -11,17 +11,20 @@ This program is designed for developers to help them manage host files, which th
 
 # Installation
 
-Arch Linux users can build the program from the AUR, here is an example using yay:
+1. Download from [Releases page](https://github.com/BrosSquad/hosts/releases/tag/v2.0.2).
+
+
+2. Building from Source
+
+**Make sure you have golang, make and git installed for your operating system**
+
 ```sh
-yay -S hosts-modifier
+$ git clone https://github.com/BrosSquad/hosts.git hosts && cd hosts
+$ git checkout tags/v2.0.2 -b v2.0.2
+$ make build VERSION=2.0.2 ENVIRONMENT=production RACE=0
+$ make install
 ```
 
-Currently the only supported methods of installation are building the program from source code or building the program from the AUR. (Don't worry, go build is simple and so is the AUR.)
-**Make sure you have golang installed for your operating system**
-
-```sh
-go get github.com/BrosSquad/hosts/v2/cmd/hosts
-```
 **Make sure you've added $GOPATH/bin to the $PATH**
 That's all.
 
