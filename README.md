@@ -11,7 +11,7 @@ This program is designed for developers to help them manage host files, which th
 
 # Installation
 
-1. Download from [Releases page](https://github.com/BrosSquad/hosts/releases/tag/v2.0.2).
+1. Download from [Releases page](https://github.com/BrosSquad/hosts/releases/tag/v2.0.3).
 
 
 2. Building from Source
@@ -20,8 +20,8 @@ This program is designed for developers to help them manage host files, which th
 
 ```sh
 $ git clone https://github.com/BrosSquad/hosts.git hosts && cd hosts
-$ git checkout tags/v2.0.2 -b v2.0.2
-$ make build VERSION=2.0.2 ENVIRONMENT=production RACE=0
+$ git checkout tags/v2.0.3 -b v2.0.3
+$ make build VERSION=2.0.3 ENVIRONMENT=production RACE=0
 $ make install
 ```
 

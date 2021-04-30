@@ -2,6 +2,7 @@ GOPATH ?= ${HOME}/go
 RACE ?= 0
 ENVIRONMENT ?= development
 VERSION ?= dev
+EXT ?=
 
 .PHONY: all
 all: clean test build
@@ -17,7 +18,7 @@ endif
 .PHONY: build
 build:
 ifeq ($(ENVIRONMENT),production)
-	CGO_ENABLED=0 go build -ldflags="-s -w -X 'main.Version=${VERSION}'" -o ./bin/hosts cmd/hosts/main.go
+	CGO_ENABLED=0 go build -ldflags="-s -w -X 'main.Version=${VERSION}'" -o ./bin/hosts$(EXT) cmd/hosts/main.go
 else ifeq ($(ENVIRONMENT),development)
 	go build -o ./bin/hosts cmd/hosts/main.go
 else
