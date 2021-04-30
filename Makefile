@@ -24,6 +24,10 @@ else
 	echo "Target ${ENVIRONMENT} is not supported"
 endif
 
+.PHONY: install
+install:
+	mv bin/hosts $GOPATH/bin
+
 .PHONY: git-setup
 git-setup:
 	git config user.name GitHub
