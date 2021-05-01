@@ -21,7 +21,7 @@ This program is designed for developers to help them manage host files, which th
 ```sh
 $ git clone https://github.com/BrosSquad/hosts.git hosts && cd hosts
 $ git checkout tags/v2.3.2 -b v2.3.2
-$ make build VERSION=2.0.3 ENVIRONMENT=production RACE=0
+$ make build VERSION=2.3.2 ENVIRONMENT=production RACE=0
 $ make install
 ```
 
