@@ -39,7 +39,7 @@ git-setup:
 commit:
 	git add .
 ifneq ($(shell git status --porcelain),)
-	git commit --author "github-actions[bot] <github-actions[bot]@users.noreply.github.com>" --message "${MESSAGE}"
+	git commit --author "github-actions[bot] <github-actions[bot]@users.noreply.github.com>" --message "${MESSAGE}" --no-verify
 	git push
 endif
 
