@@ -20,7 +20,7 @@ build:
 ifeq ($(ENVIRONMENT),production)
 	CGO_ENABLED=0 go build -ldflags="-s -w -X 'main.Version=${VERSION}'" -o ./bin/hosts$(EXT) cmd/hosts/main.go
 else ifeq ($(ENVIRONMENT),development)
-	go build -o ./bin/hosts cmd/hosts/main.go
+	go build -o ./bin/hosts$(EXT) cmd/hosts/main.go
 else
 	echo "Target ${ENVIRONMENT} is not supported"
 endif
