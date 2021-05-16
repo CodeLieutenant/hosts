@@ -28,7 +28,6 @@ type (
 		File ReadWriteName
 	}
 
-
 	HandleHost func(host, ip string, isComment bool) error
 )
 

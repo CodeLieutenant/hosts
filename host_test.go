@@ -66,7 +66,7 @@ func TestList(t *testing.T) {
 	}
 
 	err := parser.List(func(host, ip string, isComment bool) error {
-		eIp, ok := hosts[host];
+		eIp, ok := hosts[host]
 
 		if !ok {
 			t.Fatalf("Host %s is not expected", host)
@@ -87,7 +87,6 @@ func TestList(t *testing.T) {
 		t.Fatalf("Unexpected error %v", err)
 	}
 }
-
 
 func TestAdd(t *testing.T) {
 	t.Parallel()

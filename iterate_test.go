@@ -134,7 +134,6 @@ func TestIterate(t *testing.T) {
 	}
 }
 
-
 func TestLargeHostsBuffer(t *testing.T) {
 	t.Parallel()
 	buffer := bytes.NewBufferString(strings.Repeat("# some comment\n", 5_000_000))
