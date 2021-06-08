@@ -27,7 +27,7 @@ endif
 
 .PHONY: install
 install:
-	mv bin/hosts $GOPATH/bin
+	mv bin/hosts ${GOPATH}/bin
 
 .PHONY: git-setup
 git-setup:
