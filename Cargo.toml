@@ -1,0 +1,3 @@
+[workspace]
+members = [ "hosts-parser", "hosts" ]
+resolver = "2"
