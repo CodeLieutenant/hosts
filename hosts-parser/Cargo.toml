@@ -22,4 +22,5 @@ readme = "../README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+smallvec = { version = "1.9.0", features = ["const_generics", "const_new", "union"] }
 thiserror = "1.0.32"

@@ -1,7 +1,7 @@
-use std::{error::Error, fs::File, path::PathBuf, str::FromStr};
+mod app;
+mod commands;
 
-use hosts_parser::parser::Parser;
-use hosts_parser::tokenizer::Tokenizer;
+use std::error::Error;
 
 const LINUX_HOSTS_PATH: &str = "/etc/hosts";
 const MACOS_HOSTS_PATH: &str = "/etc/hosts";
@@ -21,21 +21,5 @@ const fn get_hosts_path() -> &'static str {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let hosts_file = File::options()
-        .read(true)
-        .write(false)
-        .truncate(false)
-        .append(false)
-        .open(PathBuf::from_str(get_hosts_path())?)?;
-
-    let tokens = Tokenizer::new_with_reader(&hosts_file)
-        .parse()?
-        .get_tokens();
-
-    let parser = Parser::parse(tokens)?;
-
-    // println!("{:?}", tokens);
-    println!("{}", parser.to_string());
-
-    Ok(())
+    app::execute(get_hosts_path())
 }

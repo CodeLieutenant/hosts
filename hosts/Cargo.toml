@@ -21,9 +21,10 @@ keywords = [
 license-file = "../LICENCE"
 readme = "../README.md"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-hosts-parser = { path = "../hosts-parser" }
+clap = { version = "3.2.18", features = ["once_cell", "derive"] }
+smallvec = { version = "1.9.0", features = ["const_generics", "const_new", "union"] }
 
+hosts-parser = { path = "../hosts-parser" }
 

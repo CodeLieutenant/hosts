@@ -1,66 +1,33 @@
-use std::{fmt::Display, net::IpAddr};
+use std::net::IpAddr;
+use std::ops::RangeBounds;
 
+use smallvec::SmallVec;
 use thiserror::Error as ThisError;
 
+use crate::cst::CstNode;
 use crate::lookahead::LookaheadIter;
 use crate::tokens::Tokens;
+use crate::visitor::CstVisitor;
 
 #[derive(Debug, ThisError)]
 pub enum Error {
     #[error("unexpected token {0}")]
-    UnexpectedToken(CST),
+    UnexpectedToken(CstNode),
 
     #[error("Invalid ip {0}")]
     InvalidIp(String),
 
     #[error("Expecting token: {0}")]
-    ExpectingToken(CST),
-}
-
-#[derive(Debug, Eq, PartialEq)]
-pub enum CST {
-    Host(String),
-    IP(std::net::IpAddr),
-    Comment(String),
-    Space,
-    Tab,
-    CarriageReturn,
-    NewLine,
-}
-
-impl From<Tokens> for CST {
-    fn from(token: Tokens) -> Self {
-        match token {
-            Tokens::Comment(c) => CST::Comment(c),
-            Tokens::Space => CST::Space,
-            Tokens::Tab => CST::Tab,
-            Tokens::CarriageReturn => CST::CarriageReturn,
-            Tokens::NewLine => CST::NewLine,
-            _ => unreachable!("This should not happen"),
-        }
-    }
-}
-
-impl Display for CST {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            CST::Host(host) => write!(f, "{}", host),
-            CST::IP(ip) => write!(f, "{}", ip),
-            CST::Comment(comment) => write!(f, "#{}", comment),
-            CST::Space => write!(f, " "),
-            CST::Tab => write!(f, "\t"),
-            CST::CarriageReturn => write!(f, "\r"),
-            CST::NewLine => writeln!(f),
-        }
-    }
+    ExpectingToken(CstNode),
 }
 
 #[derive(Debug)]
-pub struct Parser {
-    pub(crate) cst: Vec<CST>,
+pub struct Parser<V> {
+    pub(crate) cst: Vec<CstNode>,
+    pub(crate) visitor: Option<V>,
 }
 
-impl ToString for Parser {
+impl<V> ToString for Parser<V> {
     fn to_string(&self) -> String {
         self.cst
             .iter()
@@ -75,7 +42,53 @@ fn parse_ip(ip: String) -> Result<IpAddr, Error> {
     Ok(addr)
 }
 
-impl Parser {
+impl<V: CstVisitor> Parser<V> {
+    pub fn visit(&mut self) {
+        let visitor = match self.visitor.as_mut() {
+            Some(v) => v,
+            None => return,
+        };
+
+        for cst in self.cst.iter() {
+            visitor.visit(cst);
+        }
+    }
+}
+
+impl<V> Default for Parser<V> {
+    fn default() -> Self {
+        Self {
+            cst: Vec::new(),
+            visitor: None,
+        }
+    }
+}
+
+impl<V> Parser<V> {
+    pub fn with_visitor(self, visitor: V) -> Self
+    where
+        V: CstVisitor,
+    {
+        Self {
+            cst: self.cst,
+            visitor: Some(visitor),
+        }
+    }
+
+    pub fn remove_nodes<R>(&mut self, range: R)
+    where
+        R: RangeBounds<usize>,
+    {
+        self.cst.drain(range);
+    }
+
+    pub fn add_nodes<T, const LENGTH: usize>(&mut self, nodes: T)
+    where
+        T: Into<SmallVec<[CstNode; LENGTH]>>,
+    {
+        self.cst.extend(nodes.into().into_iter());
+    }
+
     pub fn parse(tokens: Vec<Tokens>) -> Result<Self, Error> {
         let len = tokens.len();
         let mut cst = Vec::with_capacity(len);
@@ -90,10 +103,10 @@ impl Parser {
                 Tokens::HostOrIp(ip) => {
                     if !is_ip_parsed {
                         let ip = parse_ip(ip)?;
-                        cst.push(CST::IP(ip));
+                        cst.push(CstNode::IP(ip));
                         is_ip_parsed = true;
                     } else {
-                        cst.push(CST::Host(ip));
+                        cst.push(CstNode::Host(ip));
                     }
 
                     if let Some(next) = next {
@@ -101,61 +114,61 @@ impl Parser {
                             is_ip_parsed = false;
                         }
 
-                        cst.push(CST::from(next));
+                        cst.push(CstNode::from(next));
                     }
                 }
                 Tokens::Comment(comment) => {
                     if let Some(Tokens::NewLine | Tokens::CarriageReturn) | None = next {
-                        cst.push(CST::Comment(comment));
+                        cst.push(CstNode::Comment(comment));
                     } else {
-                        return Err(Error::UnexpectedToken(CST::Comment(comment)));
+                        return Err(Error::UnexpectedToken(CstNode::Comment(comment)));
                     }
 
                     if let Some(next) = next {
-                        cst.push(CST::from(next));
+                        cst.push(CstNode::from(next));
                     }
                 }
                 Tokens::Space | Tokens::Tab => {
-                    cst.push(CST::from(token));
+                    cst.push(CstNode::from(token));
 
                     if let Some(Tokens::HostOrIp(host)) = next {
                         if !is_ip_parsed {
                             let ip = host.parse::<IpAddr>().map_err(|_| Error::InvalidIp(host))?;
-                            cst.push(CST::IP(ip));
+                            cst.push(CstNode::IP(ip));
                             is_ip_parsed = true;
                         } else {
-                            cst.push(CST::Host(host));
+                            cst.push(CstNode::Host(host));
                         }
                     }
                 }
                 Tokens::CarriageReturn => {
-                    cst.push(CST::CarriageReturn);
+                    cst.push(CstNode::CarriageReturn);
 
                     match next {
                         Some(Tokens::NewLine) => {
-                            cst.push(CST::NewLine);
+                            cst.push(CstNode::NewLine);
                         }
-                        Some(t) => return Err(Error::UnexpectedToken(CST::from(t))),
-                        None => return Err(Error::UnexpectedToken(CST::NewLine)),
+                        Some(t) => return Err(Error::UnexpectedToken(CstNode::from(t))),
+                        None => return Err(Error::UnexpectedToken(CstNode::NewLine)),
                     };
                 }
                 Tokens::NewLine => {
-                    cst.push(CST::from(token));
+                    cst.push(CstNode::from(token));
 
                     match next {
                         Some(Tokens::HostOrIp(ip)) => {
                             let ip = ip.parse::<IpAddr>().map_err(|_| Error::InvalidIp(ip))?;
-                            cst.push(CST::IP(ip));
+                            cst.push(CstNode::IP(ip));
                             is_ip_parsed = true;
                         }
-                        Some(next) => cst.push(CST::from(next)),
+                        Some(next) => cst.push(CstNode::from(next)),
                         None => {}
                     }
                 }
             }
         }
 
-        Ok(Self { cst })
+        Ok(Self { cst, visitor: None })
     }
 }
 
@@ -172,14 +185,14 @@ mod tests {
             Tokens::Space,
             Tokens::HostOrIp("localhost".to_string()),
         ];
-        let parser = Parser::parse(tokens);
+        let parser = Parser::<()>::parse(tokens);
 
         assert!(parser.is_ok());
         assert_eq!(
             vec![
-                CST::IP(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1))),
-                CST::Space,
-                CST::Host("localhost".to_string())
+                CstNode::IP(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1))),
+                CstNode::Space,
+                CstNode::Host("localhost".to_string())
             ],
             parser.unwrap().cst
         );
@@ -213,38 +226,38 @@ mod tests {
             Tokens::NewLine,
         ];
 
-        let parser = Parser::parse(tokens);
+        let parser = Parser::<()>::parse(tokens);
         assert!(parser.is_ok());
         assert_eq!(
             vec![
-                CST::Comment(
+                CstNode::Comment(
                     " localhost name resolution is handled within DNS itself.".to_string()
                 ),
-                CST::NewLine,
-                CST::Comment(" Added by Docker Desktop".to_string()),
-                CST::NewLine,
-                CST::IP("192.168.0.17".parse::<IpAddr>().unwrap()),
-                CST::Tab,
-                CST::Host("host.docker.internal".to_string()),
-                CST::NewLine,
-                CST::IP("192.168.0.17".parse::<IpAddr>().unwrap()),
-                CST::Space,
-                CST::Host("gateway.docker.internal".to_string()),
-                CST::NewLine,
-                CST::Comment(
+                CstNode::NewLine,
+                CstNode::Comment(" Added by Docker Desktop".to_string()),
+                CstNode::NewLine,
+                CstNode::IP("192.168.0.17".parse::<IpAddr>().unwrap()),
+                CstNode::Tab,
+                CstNode::Host("host.docker.internal".to_string()),
+                CstNode::NewLine,
+                CstNode::IP("192.168.0.17".parse::<IpAddr>().unwrap()),
+                CstNode::Space,
+                CstNode::Host("gateway.docker.internal".to_string()),
+                CstNode::NewLine,
+                CstNode::Comment(
                     " To allow the same kube context to work on the host and the container:"
                         .to_string()
                 ),
-                CST::NewLine,
-                CST::Tab,
-                CST::IP("127.0.0.1".parse::<IpAddr>().unwrap()),
-                CST::Tab,
-                CST::Host("kubernetes.docker.internal".to_string()),
-                CST::NewLine,
-                CST::NewLine,
-                CST::NewLine,
-                CST::Comment(" End of section".to_string()),
-                CST::NewLine,
+                CstNode::NewLine,
+                CstNode::Tab,
+                CstNode::IP("127.0.0.1".parse::<IpAddr>().unwrap()),
+                CstNode::Tab,
+                CstNode::Host("kubernetes.docker.internal".to_string()),
+                CstNode::NewLine,
+                CstNode::NewLine,
+                CstNode::NewLine,
+                CstNode::Comment(" End of section".to_string()),
+                CstNode::NewLine,
             ],
             parser.unwrap().cst
         );
@@ -278,34 +291,34 @@ mod tests {
             Tokens::NewLine,
         ];
 
-        let parser = Parser::parse(tokens);
+        let parser = Parser::<()>::parse(tokens);
         assert!(parser.is_ok());
 
         assert_eq!(
             vec![
-                CST::IP("127.0.0.1".parse::<IpAddr>().unwrap()),
-                CST::Tab,
-                CST::Host("localhost".to_string()),
-                CST::NewLine,
-                CST::IP("127.0.1.1".parse::<IpAddr>().unwrap()),
-                CST::Tab,
-                CST::Host("hp".to_string()),
-                CST::NewLine,
-                CST::NewLine,
-                CST::Comment(
+                CstNode::IP("127.0.0.1".parse::<IpAddr>().unwrap()),
+                CstNode::Tab,
+                CstNode::Host("localhost".to_string()),
+                CstNode::NewLine,
+                CstNode::IP("127.0.1.1".parse::<IpAddr>().unwrap()),
+                CstNode::Tab,
+                CstNode::Host("hp".to_string()),
+                CstNode::NewLine,
+                CstNode::NewLine,
+                CstNode::Comment(
                     " The following lines are desirable for IPv6 capable hosts".to_string(),
                 ),
-                CST::NewLine,
-                CST::IP("::1".parse::<IpAddr>().unwrap()),
-                CST::Tab,
-                CST::Host("ip6-localhost".to_string()),
-                CST::Space,
-                CST::Host("ip6-loopback".to_string()),
-                CST::NewLine,
-                CST::IP("fe00::0".parse::<IpAddr>().unwrap()),
-                CST::Space,
-                CST::Host("ip6-localnet".to_string()),
-                CST::NewLine,
+                CstNode::NewLine,
+                CstNode::IP("::1".parse::<IpAddr>().unwrap()),
+                CstNode::Tab,
+                CstNode::Host("ip6-localhost".to_string()),
+                CstNode::Space,
+                CstNode::Host("ip6-loopback".to_string()),
+                CstNode::NewLine,
+                CstNode::IP("fe00::0".parse::<IpAddr>().unwrap()),
+                CstNode::Space,
+                CstNode::Host("ip6-localnet".to_string()),
+                CstNode::NewLine,
             ],
             parser.unwrap().cst
         );
@@ -326,35 +339,40 @@ mod tests {
 ";
 
         let cst = vec![
-            CST::Comment(" localhost name resolution is handled within DNS itself.".to_string()),
-            CST::NewLine,
-            CST::Comment(" Added by Docker Desktop".to_string()),
-            CST::NewLine,
-            CST::IP("192.168.0.17".parse::<IpAddr>().unwrap()),
-            CST::Tab,
-            CST::Host("host.docker.internal".to_string()),
-            CST::NewLine,
-            CST::IP("192.168.0.17".parse::<IpAddr>().unwrap()),
-            CST::Space,
-            CST::Host("gateway.docker.internal".to_string()),
-            CST::NewLine,
-            CST::Comment(
+            CstNode::Comment(
+                " localhost name resolution is handled within DNS itself.".to_string(),
+            ),
+            CstNode::NewLine,
+            CstNode::Comment(" Added by Docker Desktop".to_string()),
+            CstNode::NewLine,
+            CstNode::IP("192.168.0.17".parse::<IpAddr>().unwrap()),
+            CstNode::Tab,
+            CstNode::Host("host.docker.internal".to_string()),
+            CstNode::NewLine,
+            CstNode::IP("192.168.0.17".parse::<IpAddr>().unwrap()),
+            CstNode::Space,
+            CstNode::Host("gateway.docker.internal".to_string()),
+            CstNode::NewLine,
+            CstNode::Comment(
                 " To allow the same kube context to work on the host and the container:"
                     .to_string(),
             ),
-            CST::NewLine,
-            CST::Tab,
-            CST::IP("127.0.0.1".parse::<IpAddr>().unwrap()),
-            CST::Tab,
-            CST::Host("kubernetes.docker.internal".to_string()),
-            CST::NewLine,
-            CST::NewLine,
-            CST::NewLine,
-            CST::Comment(" End of section".to_string()),
-            CST::NewLine,
+            CstNode::NewLine,
+            CstNode::Tab,
+            CstNode::IP("127.0.0.1".parse::<IpAddr>().unwrap()),
+            CstNode::Tab,
+            CstNode::Host("kubernetes.docker.internal".to_string()),
+            CstNode::NewLine,
+            CstNode::NewLine,
+            CstNode::NewLine,
+            CstNode::Comment(" End of section".to_string()),
+            CstNode::NewLine,
         ];
 
-        let parser = Parser { cst };
+        let parser = Parser {
+            cst,
+            visitor: Option::<()>::None,
+        };
 
         assert_eq!(expected, parser.to_string());
     }
