@@ -69,6 +69,12 @@ impl ToString for Parser {
     }
 }
 
+fn parse_ip(ip: String) -> Result<IpAddr, Error> {
+    let addr = ip.parse::<IpAddr>().map_err(|_| Error::InvalidIp(ip))?;
+
+    Ok(addr)
+}
+
 impl Parser {
     pub fn parse(tokens: Vec<Tokens>) -> Result<Self, Error> {
         let len = tokens.len();
@@ -83,15 +89,18 @@ impl Parser {
             match token {
                 Tokens::HostOrIp(ip) => {
                     if !is_ip_parsed {
-                        let ip = ip.parse::<IpAddr>().map_err(|_| Error::InvalidIp(ip))?;
+                        let ip = parse_ip(ip)?;
                         cst.push(CST::IP(ip));
                         is_ip_parsed = true;
                     } else {
                         cst.push(CST::Host(ip));
-                        is_ip_parsed = false;
                     }
 
                     if let Some(next) = next {
+                        if next == Tokens::NewLine {
+                            is_ip_parsed = false;
+                        }
+
                         cst.push(CST::from(next));
                     }
                 }
@@ -116,7 +125,6 @@ impl Parser {
                             is_ip_parsed = true;
                         } else {
                             cst.push(CST::Host(host));
-                            is_ip_parsed = false;
                         }
                     }
                 }
@@ -236,6 +244,67 @@ mod tests {
                 CST::NewLine,
                 CST::NewLine,
                 CST::Comment(" End of section".to_string()),
+                CST::NewLine,
+            ],
+            parser.unwrap().cst
+        );
+    }
+
+    #[test]
+    fn test_multiple_hosts_on_the_same_line() {
+        let tokens = vec![
+            Tokens::HostOrIp("127.0.0.1".to_string()),
+            Tokens::Tab,
+            Tokens::HostOrIp("localhost".to_string()),
+            Tokens::NewLine,
+            Tokens::HostOrIp("127.0.1.1".to_string()),
+            Tokens::Tab,
+            Tokens::HostOrIp("hp".to_string()),
+            Tokens::NewLine,
+            Tokens::NewLine,
+            Tokens::Comment(
+                " The following lines are desirable for IPv6 capable hosts".to_string(),
+            ),
+            Tokens::NewLine,
+            Tokens::HostOrIp("::1".to_string()),
+            Tokens::Tab,
+            Tokens::HostOrIp("ip6-localhost".to_string()),
+            Tokens::Space,
+            Tokens::HostOrIp("ip6-loopback".to_string()),
+            Tokens::NewLine,
+            Tokens::HostOrIp("fe00::0".to_string()),
+            Tokens::Space,
+            Tokens::HostOrIp("ip6-localnet".to_string()),
+            Tokens::NewLine,
+        ];
+
+        let parser = Parser::parse(tokens);
+        assert!(parser.is_ok());
+
+        assert_eq!(
+            vec![
+                CST::IP("127.0.0.1".parse::<IpAddr>().unwrap()),
+                CST::Tab,
+                CST::Host("localhost".to_string()),
+                CST::NewLine,
+                CST::IP("127.0.1.1".parse::<IpAddr>().unwrap()),
+                CST::Tab,
+                CST::Host("hp".to_string()),
+                CST::NewLine,
+                CST::NewLine,
+                CST::Comment(
+                    " The following lines are desirable for IPv6 capable hosts".to_string(),
+                ),
+                CST::NewLine,
+                CST::IP("::1".parse::<IpAddr>().unwrap()),
+                CST::Tab,
+                CST::Host("ip6-localhost".to_string()),
+                CST::Space,
+                CST::Host("ip6-loopback".to_string()),
+                CST::NewLine,
+                CST::IP("fe00::0".parse::<IpAddr>().unwrap()),
+                CST::Space,
+                CST::Host("ip6-localnet".to_string()),
                 CST::NewLine,
             ],
             parser.unwrap().cst

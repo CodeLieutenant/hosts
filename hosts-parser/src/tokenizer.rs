@@ -2,10 +2,13 @@ use std::{
     io::{ErrorKind, Read},
     str::from_utf8,
 };
+
 use thiserror::Error as ThisError;
 
+use crate::tokens::Tokens;
+
 #[derive(Debug, ThisError)]
-enum Error {
+pub enum Error {
     #[error(transparent)]
     Io(#[from] std::io::Error),
 
@@ -13,18 +16,8 @@ enum Error {
     Utf8Error(#[from] std::str::Utf8Error),
 }
 
-#[derive(Debug, Eq, PartialEq)]
-enum Tokens {
-    HostOrIp(String),
-    Comment(String),
-    Space,
-    Tab,
-    CarriageReturn,
-    NewLine,
-}
-
 #[derive(Debug)]
-struct Tokenizer<T> {
+pub struct Tokenizer<T> {
     input: T,
     tokens: Vec<Tokens>,
 }
@@ -145,7 +138,7 @@ impl<T: Read> Tokenizer<T> {
         }
     }
 
-    pub fn parse(&mut self) -> Result<(), Error> {
+    pub fn parse(mut self) -> Result<Self, Error> {
         let mut buf = [0u8; 4096];
 
         loop {
@@ -163,7 +156,7 @@ impl<T: Read> Tokenizer<T> {
             }
         }
 
-        Ok(())
+        Ok(self)
     }
 }
 
@@ -236,6 +229,52 @@ mod tests {
     }
 
     #[test]
+    fn it_tokenizes_multiple_hosts_on_the_same_line() {
+        let data = "\
+127.0.0.1\tlocalhost
+127.0.1.1\thp
+
+# The following lines are desirable for IPv6 capable hosts
+::1\tip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+";
+
+        let tokenizer = Tokenizer::new_with_reader(data.as_bytes());
+        let tokens = tokenizer.parse();
+
+        assert!(tokens.is_ok());
+
+        assert_eq!(
+            vec![
+                Tokens::HostOrIp("127.0.0.1".to_string()),
+                Tokens::Tab,
+                Tokens::HostOrIp("localhost".to_string()),
+                Tokens::NewLine,
+                Tokens::HostOrIp("127.0.1.1".to_string()),
+                Tokens::Tab,
+                Tokens::HostOrIp("hp".to_string()),
+                Tokens::NewLine,
+                Tokens::NewLine,
+                Tokens::Comment(
+                    " The following lines are desirable for IPv6 capable hosts".to_string()
+                ),
+                Tokens::NewLine,
+                Tokens::HostOrIp("::1".to_string()),
+                Tokens::Tab,
+                Tokens::HostOrIp("ip6-localhost".to_string()),
+                Tokens::Space,
+                Tokens::HostOrIp("ip6-loopback".to_string()),
+                Tokens::NewLine,
+                Tokens::HostOrIp("fe00::0".to_string()),
+                Tokens::Space,
+                Tokens::HostOrIp("ip6-localnet".to_string()),
+                Tokens::NewLine,
+            ],
+            tokens.unwrap().get_tokens()
+        );
+    }
+
+    #[test]
     fn it_parses_the_buffer() {
         let str = "\
 # localhost name resolution is handled within DNS itself.
@@ -284,7 +323,7 @@ mod tests {
                 Tokens::Comment(" End of section".to_string()),
                 Tokens::NewLine,
             ],
-            tokenizer.get_tokens()
+            tokens.unwrap().get_tokens()
         );
     }
 }
