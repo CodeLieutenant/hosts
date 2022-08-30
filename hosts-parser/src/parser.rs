@@ -50,7 +50,7 @@ impl Display for CST {
             CST::Space => write!(f, " "),
             CST::Tab => write!(f, "\t"),
             CST::CarriageReturn => write!(f, "\r"),
-            CST::NewLine => write!(f, "\n"),
+            CST::NewLine => writeln!(f),
         }
     }
 }

@@ -32,7 +32,9 @@ const fn end_of_comment(c: &char) -> bool {
     *c != '\n' && *c != '\r'
 }
 
-fn get_data_and_separator_fn(token: &mut Tokens) -> Option<(&mut String, fn(&char) -> bool)> {
+type CheckEnding = fn(&char) -> bool;
+
+fn get_data_and_separator_fn(token: &mut Tokens) -> Option<(&mut String, CheckEnding)> {
     match token {
         Tokens::HostOrIp(ref mut data) => Some((data, end_of_host_or_ip)),
         Tokens::Comment(ref mut data) => Some((data, end_of_comment)),
@@ -287,7 +289,7 @@ fe00::0 ip6-localnet
 
 # End of section
 ";
-        let mut tokenizer = Tokenizer::new_with_reader(str.as_bytes());
+        let tokenizer = Tokenizer::new_with_reader(str.as_bytes());
         let tokens = tokenizer.parse();
 
         assert!(tokens.is_ok());
