@@ -2,8 +2,28 @@
 name = "hosts"
 version = "0.1.0"
 edition = "2021"
+authors = ["Dusan Malusev <dusan@dusanmalusev.dev>"]
+categories = ["library", "hosts-parser", "/etc/hosts"]
+description = "Small parser and lexer library for Hosts file format"
+keywords = [
+    "cli",
+    "app",
+    "library",
+    "hosts",
+    "parser",
+    "lexer",
+    "hosts-parser",
+    "hosts-lexer",
+    "linux-hosts",
+    "windows-hosts",
+    "macos-hosts",
+]
+license-file = "../LICENCE"
+readme = "../README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 hosts-parser = { path = "../hosts-parser" }
+
+
