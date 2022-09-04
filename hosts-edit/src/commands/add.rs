@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use hosts_parser::cst::{Cst, CstNode};
+use hoster::cst::{Cst, CstNode};
 use smallvec::{smallvec, SmallVec};
 
 pub(crate) fn execute<W>(

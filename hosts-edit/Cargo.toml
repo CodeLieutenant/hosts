@@ -26,5 +26,5 @@ readme = "../README.md"
 clap = { version = "3.2.18", features = ["once_cell", "derive"] }
 smallvec = { version = "1.9.0", features = ["const_generics", "const_new", "union"] }
 tempfile = "3"
-hosts-parser = { path = "../hoster" }
+hoster = { path = "../hoster" }
 

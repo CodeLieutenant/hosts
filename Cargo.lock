@@ -101,21 +101,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "hosts-edit"
-version = "0.1.0"
-dependencies = [
- "clap",
- "hosts-parser",
- "smallvec",
- "tempfile",
-]
-
-[[package]]
-name = "hosts-parser"
+name = "hoster"
 version = "0.1.0"
 dependencies = [
  "smallvec",
  "thiserror",
+]
+
+[[package]]
+name = "hosts-edit"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "hoster",
+ "smallvec",
+ "tempfile",
 ]
 
 [[package]]
