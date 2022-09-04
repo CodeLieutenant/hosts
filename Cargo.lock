@@ -101,7 +101,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "hosts"
+name = "hosts-edit"
 version = "0.1.0"
 dependencies = [
  "clap",
