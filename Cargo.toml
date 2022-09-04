@@ -1,5 +1,5 @@
 [workspace]
-members = [ "hosts-parser", "hosts" ]
+members = [ "hosts-edit", "hoster" ]
 resolver = "2"
 
 [profile.dist]

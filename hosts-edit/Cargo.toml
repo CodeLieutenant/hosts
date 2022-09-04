@@ -1,9 +1,9 @@
 [package]
-name = "hosts"
-version = "0.1.0"
+name = "hosts-edit"
+version = "0.1.1"
 edition = "2021"
 authors = ["Dusan Malusev <dusan@dusanmalusev.dev>"]
-categories = ["library", "hosts-parser", "/etc/hosts"]
+categories = ["parsing", "filesystem", "development-tools"]
 description = "Small parser and lexer library for Hosts file format"
 keywords = [
     "cli",
@@ -26,5 +26,5 @@ readme = "../README.md"
 clap = { version = "3.2.18", features = ["once_cell", "derive"] }
 smallvec = { version = "1.9.0", features = ["const_generics", "const_new", "union"] }
 tempfile = "3"
-hosts-parser = { path = "../hosts-parser" }
+hoster = { path = "../hoster" }
 

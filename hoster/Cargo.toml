@@ -1,17 +1,15 @@
 [package]
-name = "hosts-parser"
-version = "0.1.0"
+name = "hoster"
+version = "0.1.1"
 edition = "2021"
 authors = ["Dusan Malusev <dusan@dusanmalusev.dev>"]
-categories = ["library", "hosts-parser", "/etc/hosts"]
 description = "Small parser and lexer library for Hosts file format"
+categories = ["parsing", "filesystem", "development-tools"]
+documentation = "https://docs.rs/hoster/0.1.1"
+homepage = "https://github.com/BrosSquad/hosts"
 keywords = [
-    "library",
     "hosts",
-    "parser",
-    "lexer",
     "hosts-parser",
-    "hosts-lexer",
     "linux-hosts",
     "windows-hosts",
     "macos-hosts",

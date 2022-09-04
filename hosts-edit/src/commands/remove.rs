@@ -1,6 +1,6 @@
 use std::io::{Read, Write};
 
-use hosts_parser::{cst::CstNode, parser::Parser, tokenizer::Tokenizer, visitor::CstVisitor};
+use hoster::{cst::CstNode, parser::Parser, tokenizer::Tokenizer, visitor::CstVisitor};
 
 pub(crate) fn execute<R, W>(
     mut reader: R,
