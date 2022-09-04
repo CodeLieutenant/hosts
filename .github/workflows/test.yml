@@ -44,7 +44,6 @@ jobs:
           - macos-latest
         include:
           - rust: stable
-            features: "--features full"
     runs-on: ${{ matrix.os }}
     name: Test ${{ matrix.rust }} on ${{ matrix.os }}
     needs: [style]
@@ -63,14 +62,13 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: ${{ matrix.features }}
 
       - name: Test all benches
         if: matrix.benches
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --benches ${{ matrix.features }}
+          args: --benches
   miri:
     name: Test with Miri
     needs: [style]
