@@ -41,7 +41,6 @@ where
     let app = App::parse();
 
     let mut file_options = File::options();
-    file_options.truncate(false);
 
     match app.commands {
         Commands::Add { host, ip, comment } => {
@@ -53,15 +52,14 @@ where
             )?;
         }
         Commands::Remove { host } => {
-            let mut hosts = file_options.append(true).open(path.into())?;
-            let mut data = Vec::with_capacity(100);
+            let mut hosts = file_options.open(path.into())?;
+            let mut data = Vec::with_capacity(2048);
 
             remove_command(&mut hosts, Cursor::new(&mut data), host)?;
 
             hosts.seek(SeekFrom::Start(0))?;
             hosts.set_len(data.len() as u64)?;
             let _n = hosts.write(&data)?;
-
         }
         Commands::List { with_comments } => {
             println!("{}", with_comments);
