@@ -4,6 +4,9 @@ version = "0.1.1"
 edition = "2021"
 authors = ["Dusan Malusev <dusan@dusanmalusev.dev>"]
 description = "Small parser and lexer library for Hosts file format"
+categories = ["parsing", "filesystem", "development-tools"]
+documentation = "https://docs.rs/hoster/0.1.1"
+homepage = "https://github.com/BrosSquad/hosts"
 keywords = [
     "hosts",
     "hosts-parser",

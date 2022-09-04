@@ -3,6 +3,7 @@ name = "hosts-edit"
 version = "0.1.1"
 edition = "2021"
 authors = ["Dusan Malusev <dusan@dusanmalusev.dev>"]
+categories = ["parsing", "filesystem", "development-tools"]
 description = "Small parser and lexer library for Hosts file format"
 keywords = [
     "cli",
