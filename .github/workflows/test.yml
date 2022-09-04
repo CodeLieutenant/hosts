@@ -1,32 +1,92 @@
-# name: 'Testing'
+name: 'Testing'
 
-# on:
-#   push:
-#     branches:
-#       - master
-#   pull_request:
-#     branches:
-#       - master
-#       - dev
-# jobs:
-#   test:
-#     strategy:
-#       matrix:
-#         os: [ubuntu-latest, macos-latest, windows-latest]
-#         go: [1.15.x, 1.16.x]
-#     runs-on: ${{ matrix.os }}
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v2
-#       - name: Install Go
-#         uses: actions/setup-go@v2
-#         with:
-#           go-version: 1.16.x
-#       - uses: actions/cache@v2
-#         with:
-#           path: ~/go/pkg/mod
-#           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-#           restore-keys: |
-#             ${{ runner.os }}-go-
-#       - name: Test ${{ matrix.go }}
-#         run: make test RACE=1 ENVIRONMENT=development
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+      - dev
+
+env:
+  RUST_BACKTRACE: 1
+
+jobs:
+  style:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          components: rustfmt
+      - name: cargo fmt --check
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+  test:
+    strategy:
+      matrix:
+        rust:
+          - stable
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+        include:
+          - rust: stable
+            features: "--features full"
+    runs-on: ${{ matrix.os }}
+    name: Test ${{ matrix.rust }} on ${{ matrix.os }}
+    needs: [style]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Rust (${{ matrix.rust }})
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+
+      - name: Test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: ${{ matrix.features }}
+
+      - name: Test all benches
+        if: matrix.benches
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --benches ${{ matrix.features }}
+  miri:
+    name: Test with Miri
+    needs: [style]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          components: miri
+          override: true
+
+      - name: Test
+        run: MIRIFLAGS="-Zmiri-disable-isolation" cargo miri test

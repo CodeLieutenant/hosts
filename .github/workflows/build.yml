@@ -1,0 +1,53 @@
+name: 'Testing'
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      profile:
+        description: 'Cargo build profile (debug|release|dist)'
+        required: true
+        type: string
+        default: release
+env:
+  RUST_BACKTRACE: 1
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        rust:
+          - stable
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.rust }} on ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Rust (${{ matrix.rust }})
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+      - name: Test
+        uses: actions-rs/cargo@v1
+        id: build
+        with:
+          command: build
+          args: --profile ${{ inputs.profile }}
+      - name: Archive production artifacts
+        if: ${{ matrix.os != 'ubuntu-latest' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: hosts-edit-binary-${{ matrix.os }}
+          path: ./target/${{ inputs.profile }}/hosts-edit
+      - name: Archive production artifacts
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: hosts-edit-binary-${{ matrix.os }}
+          path: ./target/${{ inputs.profile }}/hosts-edit.exe
