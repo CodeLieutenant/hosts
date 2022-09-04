@@ -102,7 +102,7 @@ dependencies = [
 
 [[package]]
 name = "hoster"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "smallvec",
  "thiserror",
@@ -110,7 +110,7 @@ dependencies = [
 
 [[package]]
 name = "hosts-edit"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "clap",
  "hoster",
