@@ -1,8 +1,10 @@
+use std::io::{Cursor, Seek, SeekFrom, Write};
 use std::{fs::File, path::PathBuf};
 
 use clap::{Parser, Subcommand};
 
 use crate::commands::add::execute as add_command;
+use crate::commands::remove::execute as remove_command;
 
 #[derive(Debug, Subcommand)]
 pub(crate) enum Commands {
@@ -33,7 +35,8 @@ pub struct App {
 }
 
 pub fn execute<P>(path: P) -> Result<(), Box<dyn std::error::Error>>
-where P: Into<PathBuf>
+where
+    P: Into<PathBuf>,
 {
     let app = App::parse();
 
@@ -42,10 +45,23 @@ where P: Into<PathBuf>
 
     match app.commands {
         Commands::Add { host, ip, comment } => {
-            add_command(file_options.append(true).open(path.into())?, ip, host, comment)?;
+            add_command(
+                file_options.append(true).open(path.into())?,
+                ip,
+                host,
+                comment,
+            )?;
         }
         Commands::Remove { host } => {
-            println!("{}", host);
+            let mut hosts = file_options.append(true).open(path.into())?;
+            let mut data = Vec::with_capacity(100);
+
+            remove_command(&mut hosts, Cursor::new(&mut data), host)?;
+
+            hosts.seek(SeekFrom::Start(0))?;
+            hosts.set_len(data.len() as u64)?;
+            let _n = hosts.write(&data)?;
+
         }
         Commands::List { with_comments } => {
             println!("{}", with_comments);
