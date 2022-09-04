@@ -6,12 +6,8 @@ authors = ["Dusan Malusev <dusan@dusanmalusev.dev>"]
 categories = ["library", "hosts-parser", "/etc/hosts"]
 description = "Small parser and lexer library for Hosts file format"
 keywords = [
-    "library",
     "hosts",
-    "parser",
-    "lexer",
     "hosts-parser",
-    "hosts-lexer",
     "linux-hosts",
     "windows-hosts",
     "macos-hosts",
