@@ -1,9 +1,11 @@
-pub(crate) struct LookaheadIter<I>{
+pub(crate) struct LookaheadIter<I> {
     pub(crate) iter: I,
 }
 
 impl<I> Iterator for LookaheadIter<I>
-where I: Iterator {
+where
+    I: Iterator,
+{
     type Item = (I::Item, Option<I::Item>);
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -20,7 +22,9 @@ mod tests {
     #[test]
     fn it_iterates_multiple() {
         let items = vec![1, 2, 3];
-        let mut iter = LookaheadIter{ iter: items.into_iter() };
+        let mut iter = LookaheadIter {
+            iter: items.into_iter(),
+        };
 
         assert_eq!(iter.next(), Some((1, Some(2))));
         assert_eq!(iter.next(), Some((3, None)));
@@ -29,7 +33,9 @@ mod tests {
     #[test]
     fn it_iterates_with_for() {
         let items = vec![1, 2, 3];
-        let mut iter = LookaheadIter{ iter: items.into_iter() };
+        let mut iter = LookaheadIter {
+            iter: items.into_iter(),
+        };
         let mut eq = vec![(1, Some(2)), (3, None)].into_iter();
 
         for (item, next) in &mut iter {
