@@ -132,6 +132,14 @@ impl<T> Tokenizer<T> {
     }
 }
 
+fn check_bom_bytes_utf8(buffer: &[u8]) -> bool {
+    buffer.len() >= 3 && buffer[0] == 0xEF && buffer[1] == 0xBB && buffer[2] == 0xBF
+}
+
+fn check_bom_bytes_utf16(buffer: &[u8]) -> bool {
+    buffer.len() >= 2 && buffer[0] == 0xFE && buffer[1] == 0xFF
+}
+
 impl<T: Read> Tokenizer<T> {
     pub fn new_with_reader(file: T) -> Tokenizer<T> {
         Tokenizer {
@@ -141,15 +149,23 @@ impl<T: Read> Tokenizer<T> {
     }
 
     pub fn parse(mut self) -> Result<Self, Error> {
-        let mut buf = [0u8; 4096];
-
+        let mut read_buffer = [0u8; 4096];
+        let mut buff: &[u8];
         loop {
-            let result = self.input.read(&mut buf[..]);
+            let result = self.input.read(&mut read_buffer[..]);
 
             match result {
                 Ok(0) => break,
                 Ok(n) => {
-                    self.parse_slice(&buf[..n])?;
+                    buff = if check_bom_bytes_utf8(&read_buffer) {
+                        &read_buffer[3..n]
+                    } else if check_bom_bytes_utf16(&read_buffer) {
+                        &read_buffer[2..n]
+                    } else {
+                        &read_buffer[..n]
+                    };
+
+                    self.parse_slice(buff)?;
                 }
                 Err(e) => match e.kind() {
                     ErrorKind::Interrupted => continue,

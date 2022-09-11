@@ -30,6 +30,19 @@
 			],
 			"group": "build",
 			"label": "rust: cargo build"
+		},
+		{
+			"type": "cargo",
+			"command": "build",
+			"problemMatcher": [
+				"$rustc"
+			],
+			"args": [
+				"--profile",
+				"dist"
+			],
+			"group": "build",
+			"label": "rust: cargo build dist"
 		}
 	]
 }

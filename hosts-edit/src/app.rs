@@ -4,6 +4,7 @@ use std::{fs::File, path::PathBuf};
 use clap::{Parser, Subcommand};
 
 use crate::commands::add::execute as add_command;
+use crate::commands::list::execute as list_command;
 use crate::commands::remove::execute as remove_command;
 
 #[derive(Debug, Subcommand)]
@@ -13,7 +14,7 @@ pub(crate) enum Commands {
         host: String,
         #[clap(required = false, value_parser)]
         ip: String,
-        #[clap(required = false, value_parser)]
+        #[clap(short, long, required = false, value_parser)]
         comment: Option<String>,
     },
     Remove {
@@ -21,7 +22,7 @@ pub(crate) enum Commands {
         host: String,
     },
     List {
-        #[clap(required = false, value_parser)]
+        #[clap(short, long, required = false, value_parser)]
         with_comments: bool,
     },
     Version,
@@ -45,7 +46,7 @@ where
     match app.commands {
         Commands::Add { host, ip, comment } => {
             add_command(
-                file_options.append(true).open(path.into())?,
+                &mut file_options.append(true).open(path.into())?,
                 ip,
                 host,
                 comment,
@@ -62,7 +63,10 @@ where
             let _n = hosts.write(&data)?;
         }
         Commands::List { with_comments } => {
-            println!("{}", with_comments);
+            list_command(
+                &mut file_options.append(false).read(true).open(path.into())?,
+                with_comments,
+            )?;
         }
         Commands::Version => {
             println!("{}", env!("CARGO_PKG_VERSION"));

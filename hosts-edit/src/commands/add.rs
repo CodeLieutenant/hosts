@@ -4,7 +4,7 @@ use hoster::cst::{Cst, CstNode};
 use smallvec::{smallvec, SmallVec};
 
 pub(crate) fn execute<W>(
-    mut writer: W,
+    writer: &mut W,
     ip: String,
     host: String,
     comment: Option<String>,

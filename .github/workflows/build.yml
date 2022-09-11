@@ -1,4 +1,4 @@
-name: 'Testing'
+name: 'Build'
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
         description: 'Cargo build profile (debug|release|dist)'
         required: true
         type: string
-        default: release
+        default: dist
 env:
   RUST_BACKTRACE: 1
 
@@ -38,9 +38,9 @@ jobs:
         id: build
         with:
           command: build
-          args: --profile ${{ inputs.profile }}
+          args: --profile ${{ inputs.profile }} --all
       - name: Archive production artifacts
-        if: ${{ matrix.os != 'ubuntu-latest' }}
+        if: ${{ matrix.os != 'windows-latest' }}
         uses: actions/upload-artifact@v3
         with:
           name: hosts-edit-binary-${{ matrix.os }}
