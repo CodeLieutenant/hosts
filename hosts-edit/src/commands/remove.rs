@@ -6,11 +6,8 @@ pub(crate) fn execute(
     reader: &mut impl Read,
     writer: &mut impl Write,
     host: String,
-) -> Result<(), Box<dyn std::error::Error>>
-{
-    let tokens = Tokenizer::new_with_reader(reader)
-        .parse()?
-        .get_tokens();
+) -> Result<(), Box<dyn std::error::Error>> {
+    let tokens = Tokenizer::new_with_reader(reader).parse()?.get_tokens();
 
     let mut parser = Parser::builder()
         .visitor(Visitor::new(host.as_str()))
@@ -50,7 +47,7 @@ impl<'a> Visitor<'a> {
     }
 
     #[inline(always)]
-    pub /*const*/ fn get_start(&self) ->  Option<usize> {
+    pub fn get_start(&self) -> Option<usize> {
         if self.hosts_on_line > 1 {
             self.host_to_remove_pos.or(Some(self.start))
         } else {
@@ -59,7 +56,7 @@ impl<'a> Visitor<'a> {
     }
 
     #[inline(always)]
-    pub /*const*/ fn get_end(&self) -> Option<usize> {
+    pub fn get_end(&self) -> Option<usize> {
         if self.hosts_on_line > 1 {
             self.host_to_remove_pos.or(Some(self.end))
         } else {
