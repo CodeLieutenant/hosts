@@ -22,7 +22,7 @@ pub(crate) fn execute(
     let visitor = parser.get_visitor().unwrap();
 
     if visitor.has_found() {
-        cst.remove_nodes(visitor.get_start()..=visitor.get_end());
+        cst.remove_nodes(visitor.get_start().unwrap()..=visitor.get_end().unwrap());
         writer.write_all(cst.to_string().as_bytes())?;
     }
 
@@ -49,19 +49,19 @@ impl<'a> Visitor<'a> {
         }
     }
 
-    pub fn get_start(&self) -> usize {
+    pub /*const*/ fn get_start(&self) ->  Option<usize> {
         if self.hosts_on_line > 1 {
-            self.host_to_remove_pos.unwrap()
+            self.host_to_remove_pos.or(Some(self.start))
         } else {
-            self.start
+            Some(self.start)
         }
     }
 
-    pub fn get_end(&self) -> usize {
+    pub /*const*/ fn get_end(&self) -> Option<usize> {
         if self.hosts_on_line > 1 {
-            self.host_to_remove_pos.unwrap()
+            self.host_to_remove_pos.or(Some(self.end))
         } else {
-            self.end
+            Some(self.end)
         }
     }
 
