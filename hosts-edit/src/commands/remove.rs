@@ -2,16 +2,13 @@ use std::io::{Read, Write};
 
 use hoster::{cst::CstNode, parser::Parser, tokenizer::Tokenizer, visitor::CstVisitor};
 
-pub(crate) fn execute<R, W>(
-    mut reader: R,
-    mut writer: W,
+pub(crate) fn execute(
+    reader: &mut impl Read,
+    writer: &mut impl Write,
     host: String,
 ) -> Result<(), Box<dyn std::error::Error>>
-where
-    R: Read,
-    W: Write,
 {
-    let tokens = Tokenizer::new_with_reader(&mut reader)
+    let tokens = Tokenizer::new_with_reader(reader)
         .parse()?
         .get_tokens();
 

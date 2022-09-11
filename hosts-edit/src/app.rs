@@ -56,7 +56,7 @@ where
             let mut hosts = file_options.open(path.into())?;
             let mut data = Vec::with_capacity(2048);
 
-            remove_command(&mut hosts, Cursor::new(&mut data), host)?;
+            remove_command(&mut hosts, &mut Cursor::new(&mut data), host)?;
 
             hosts.seek(SeekFrom::Start(0))?;
             hosts.set_len(data.len() as u64)?;
