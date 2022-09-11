@@ -1,0 +1,30 @@
+[package]
+name = "hosts-edit"
+version = "0.1.1"
+edition = "2021"
+authors = ["Dusan Malusev <dusan@dusanmalusev.dev>"]
+categories = ["parsing", "filesystem", "development-tools"]
+description = "Small parser and lexer library for Hosts file format"
+keywords = [
+    "cli",
+    "app",
+    "library",
+    "hosts",
+    "parser",
+    "lexer",
+    "hosts-parser",
+    "hosts-lexer",
+    "linux-hosts",
+    "windows-hosts",
+    "macos-hosts",
+]
+license-file = "../LICENCE"
+readme = "../README.md"
+
+
+[dependencies]
+clap = { version = "3.2.18", features = ["once_cell", "derive"] }
+smallvec = { version = "1.9.0", features = ["const_generics", "const_new", "union"] }
+tempfile = "3"
+hoster = { path = "../hoster" }
+

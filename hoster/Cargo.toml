@@ -1,0 +1,24 @@
+[package]
+name = "hoster"
+version = "0.1.1"
+edition = "2021"
+authors = ["Dusan Malusev <dusan@dusanmalusev.dev>"]
+description = "Small parser and lexer library for Hosts file format"
+categories = ["parsing", "filesystem", "development-tools"]
+documentation = "https://docs.rs/hoster/0.1.1"
+homepage = "https://github.com/BrosSquad/hosts"
+keywords = [
+    "hosts",
+    "hosts-parser",
+    "linux-hosts",
+    "windows-hosts",
+    "macos-hosts",
+]
+license-file = "../LICENCE"
+readme = "../README.md"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+smallvec = { version = "1.9.0", features = ["const_generics", "const_new", "union"] }
+thiserror = "1.0.32"
