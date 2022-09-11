@@ -143,6 +143,7 @@ impl<V> Parser<V> {
                     match next {
                         Some(Tokens::NewLine) => {
                             cst.add_node(CstNode::NewLine);
+                            is_ip_parsed = false;
                         }
                         Some(t) => return Err(Error::UnexpectedToken(CstNode::from(t))),
                         None => return Err(Error::UnexpectedToken(CstNode::NewLine)),
