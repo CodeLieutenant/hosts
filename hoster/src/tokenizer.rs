@@ -7,6 +7,8 @@ use thiserror::Error as ThisError;
 
 use crate::tokens::Tokens;
 
+const READ_BUFFER_SIZE: usize = 32 * 1024;
+
 #[derive(Debug, ThisError)]
 pub enum Error {
     #[error(transparent)]
@@ -149,7 +151,7 @@ impl<T: Read> Tokenizer<T> {
     }
 
     pub fn parse(mut self) -> Result<Self, Error> {
-        let mut read_buffer = [0u8; 4096];
+        let mut read_buffer = [0u8; READ_BUFFER_SIZE];
         let mut buff: &[u8];
         loop {
             let result = self.input.read(&mut read_buffer[..]);
