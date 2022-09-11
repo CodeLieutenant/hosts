@@ -266,6 +266,79 @@ mod tests {
     }
 
     #[test]
+    fn test_with_carriage_return() {
+        let tokens = vec![
+            Tokens::Comment(" Added by Docker Desktop".to_string()),
+            Tokens::CarriageReturn,
+            Tokens::NewLine,
+            Tokens::HostOrIp("192.168.0.17".to_string()),
+            Tokens::Space,
+            Tokens::HostOrIp("host.docker.internal".to_string()),
+            Tokens::CarriageReturn,
+            Tokens::NewLine,
+            Tokens::HostOrIp("192.168.0.17".to_string()),
+            Tokens::Space,
+            Tokens::HostOrIp("gateway.docker.internal".to_string()),
+            Tokens::CarriageReturn,
+            Tokens::NewLine,
+            Tokens::Comment(
+                " To allow the same kube context to work on the host and the container:"
+                    .to_string(),
+            ),
+            Tokens::CarriageReturn,
+            Tokens::NewLine,
+            Tokens::HostOrIp("127.0.0.1".to_string()),
+            Tokens::Space,
+            Tokens::HostOrIp("kubernetes.docker.internal".to_string()),
+            Tokens::CarriageReturn,
+            Tokens::NewLine,
+            Tokens::Comment(" End of section".to_string()),
+            Tokens::CarriageReturn,
+            Tokens::NewLine,
+        ];
+
+        let parser = Parser::default();
+
+        let cst = parser.parse::<1>(tokens);
+        assert!(cst.is_ok());
+
+        let cst = cst.unwrap();
+
+        assert_eq!(
+            smallvec_inline![
+                CstNode::Comment(" Added by Docker Desktop".to_string()),
+                CstNode::CarriageReturn,
+                CstNode::NewLine,
+                CstNode::IP("192.168.0.17".parse().unwrap()),
+                CstNode::Space,
+                CstNode::Host("host.docker.internal".to_string()),
+                CstNode::CarriageReturn,
+                CstNode::NewLine,
+                CstNode::IP("192.168.0.17".parse().unwrap()),
+                CstNode::Space,
+                CstNode::Host("gateway.docker.internal".to_string()),
+                CstNode::CarriageReturn,
+                CstNode::NewLine,
+                CstNode::Comment(
+                    " To allow the same kube context to work on the host and the container:"
+                        .to_string()
+                ),
+                CstNode::CarriageReturn,
+                CstNode::NewLine,
+                CstNode::IP("127.0.0.1".parse().unwrap()),
+                CstNode::Space,
+                CstNode::Host("kubernetes.docker.internal".to_string()),
+                CstNode::CarriageReturn,
+                CstNode::NewLine,
+                CstNode::Comment(" End of section".to_string()),
+                CstNode::CarriageReturn,
+                CstNode::NewLine,
+            ],
+            cst.nodes
+        );
+    }
+
+    #[test]
     fn test_multiple_hosts_on_the_same_line() {
         let tokens = vec![
             Tokens::HostOrIp("127.0.0.1".to_string()),

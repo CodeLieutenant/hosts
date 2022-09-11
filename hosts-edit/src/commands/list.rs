@@ -12,7 +12,7 @@ where
 {
     let tokens = Tokenizer::new_with_reader(reader).parse()?.get_tokens();
 
-        println!("{:#?}", tokens);
+    println!("{:#?}", tokens);
 
     let mut parser = Parser::builder()
         .visitor(Visitor {
