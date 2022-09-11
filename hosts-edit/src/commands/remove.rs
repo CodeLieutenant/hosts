@@ -49,6 +49,7 @@ impl<'a> Visitor<'a> {
         }
     }
 
+    #[inline(always)]
     pub /*const*/ fn get_start(&self) ->  Option<usize> {
         if self.hosts_on_line > 1 {
             self.host_to_remove_pos.or(Some(self.start))
@@ -57,6 +58,7 @@ impl<'a> Visitor<'a> {
         }
     }
 
+    #[inline(always)]
     pub /*const*/ fn get_end(&self) -> Option<usize> {
         if self.hosts_on_line > 1 {
             self.host_to_remove_pos.or(Some(self.end))
@@ -65,6 +67,7 @@ impl<'a> Visitor<'a> {
         }
     }
 
+    #[inline(always)]
     pub fn has_found(&self) -> bool {
         self.host_to_remove_pos.is_some()
     }
