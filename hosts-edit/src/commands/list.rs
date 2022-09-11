@@ -12,8 +12,6 @@ where
 {
     let tokens = Tokenizer::new_with_reader(reader).parse()?.get_tokens();
 
-    println!("{:#?}", tokens);
-
     let mut parser = Parser::builder()
         .visitor(Visitor {
             print_new_line: false,
@@ -21,8 +19,6 @@ where
         .build();
 
     let cst = parser.parse::<1>(tokens)?;
-
-    println!("{:#?}", cst);
 
     parser.visit(&cst);
     Ok(())
@@ -37,10 +33,10 @@ impl CstVisitor for Visitor {
         match node {
             CstNode::Host(host) => {
                 self.print_new_line = true;
-                print!("{}  ", host);
+                print!("\t{}", host);
             }
             CstNode::IP(ip) => {
-                print!("{}  ", ip);
+                print!("{}", ip);
                 self.print_new_line = false;
             }
             CstNode::NewLine => {
