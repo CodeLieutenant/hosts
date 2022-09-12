@@ -1,11 +1,11 @@
 [package]
 name = "hoster"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 authors = ["Dusan Malusev <dusan@dusanmalusev.dev>"]
 description = "Small parser and lexer library for Hosts file format"
 categories = ["parsing", "filesystem", "development-tools"]
-documentation = "https://docs.rs/hoster/0.1.1"
+documentation = "https://docs.rs/hoster/0.2.0"
 homepage = "https://github.com/BrosSquad/hosts"
 keywords = [
     "hosts",

@@ -63,8 +63,11 @@ where
             let _n = hosts.write(&data)?;
         }
         Commands::List { with_comments } => {
+            let stdout = std::io::stdout();
+
             list_command(
                 &mut file_options.append(false).read(true).open(path.into())?,
+                &mut  stdout.lock(),
                 with_comments,
             )?;
         }
