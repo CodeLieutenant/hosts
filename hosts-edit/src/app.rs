@@ -67,7 +67,7 @@ where
 
             list_command(
                 &mut file_options.append(false).read(true).open(path.into())?,
-                &mut  stdout.lock(),
+                &mut stdout.lock(),
                 with_comments,
             )?;
         }
