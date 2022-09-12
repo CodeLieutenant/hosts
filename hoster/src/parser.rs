@@ -400,4 +400,35 @@ mod tests {
             cst.unwrap().nodes
         );
     }
+
+    #[test]
+    fn test_multiple_hosts_on_the_same_line_with_carriage_return() {
+        let tokens = vec![
+            Tokens::HostOrIp("192.168.0.17".to_string()),
+            Tokens::Tab,
+            Tokens::HostOrIp("host.docker.internal".to_string()),
+            Tokens::Space,
+            Tokens::Comment(" Comment".to_string()),
+            Tokens::NewLine,
+        ];
+
+        let parser = Parser::default();
+
+        let cst = parser.parse::<10>(tokens);
+        assert!(cst.is_ok());
+
+        let cst = cst.unwrap();
+
+        assert_eq!(
+            smallvec_inline![
+                CstNode::IP("192.168.0.17".parse::<IpAddr>().unwrap()),
+                CstNode::Tab,
+                CstNode::Host("host.docker.internal".to_string()),
+                CstNode::Space,
+                CstNode::Comment(" Comment".to_string()),
+                CstNode::NewLine,
+            ],
+            cst.nodes
+        );
+    }
 }

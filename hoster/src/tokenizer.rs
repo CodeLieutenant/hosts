@@ -346,4 +346,26 @@ fe00::0 ip6-localnet
             tokens.unwrap().get_tokens()
         );
     }
+
+    #[test]
+    fn it_parses_comment_on_the_same_line_as_ip_and_host() {
+        let str = "192.168.0.17\thost.docker.internal # Comment\n";
+
+        let tokenizer = Tokenizer::new_with_reader(str.as_bytes());
+        let tokens = tokenizer.parse();
+
+        assert!(tokens.is_ok());
+
+        assert_eq!(
+            vec![
+                Tokens::HostOrIp("192.168.0.17".to_string()),
+                Tokens::Tab,
+                Tokens::HostOrIp("host.docker.internal".to_string()),
+                Tokens::Space,
+                Tokens::Comment(" Comment".to_string()),
+                Tokens::NewLine,
+            ],
+            tokens.unwrap().get_tokens()
+        );
+    }
 }
